@@ -3,6 +3,13 @@
 
 	"description": "This module converts an address to a host of information about the address, available via a project link.",
 	
+    "authors": [
+        {
+            "name": "Scott J. Pearson",
+            "email": "scott.j.pearson@vanderbilt.edu"
+        }
+    ],
+
 	"permissions": [
 		"hook_save_record",
                 "select_data",

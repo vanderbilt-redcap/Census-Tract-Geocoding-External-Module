@@ -63,7 +63,6 @@ class CensusExternalModule extends AbstractExternalModule
 						}
 						die("Failed at first upload:<br>".implode("<br>", $response['errors']));
 					}
-					
 				}
 
 				if (isset($json['result']['addressMatches'][0]['geographies'])) {
