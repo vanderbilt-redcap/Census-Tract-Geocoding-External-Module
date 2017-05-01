@@ -26,34 +26,42 @@ class CensusExternalModule extends AbstractExternalModule
 
 			if (count($keys) == count($fields)) {
 				echo "<script>
+                $(document).ready(function() {
+                    console.log('document ready');
 					function downloadCensusData() {
-						var address = $('#".$addressField."').val();
+                        console.log('downloadCensusData');
+						var address = $('[name=\"".$addressField."\"]').val();
 						var keys = ".json_encode($keys).";
 						var fields = ".json_encode($fields).";
 
 						if (address) {
-							var encodedAddress = address.replace(/\s+/, '+');
-							encodedAddress = encodedAddress.replace(/United States/, '+');
-							var url = 'https://geocoding.geo.census.gov/geocoder/geographies/onelineaddress?address='+encodedAddress+'&benchmark=Public_AR_Census2010&vintage=Census2010_Census2010&layers=14&format=json';
-							$.post(url, {}, function(json) {
-								var data = JSON.parse(json);
-
-								if (data && data['result'] && data['result']['addressMatches'] && data['result']['addressMatches'][0] && data['result']['addressMatches'][0]['geographies'] && data['result']['addressMatches'][0]['geographies']['Census Blocks']) {
-									var lookupTable = data['result']['addressMatches'][0]['geographies']['Census Blocks'][0];
-									for (var i=0; i < fields.length; i++) {
-										if (lookupTable[keys[i]]) {
-											$('#'+fields[i]).val(lookupTable[keys[i]]);
-										} else {
-											$('#'+fields[i]).val('');
-										}
-									}
-								});
+							var encodedAddress = address.replace(/\s+/g, '+');
+							encodedAddress = encodedAddress.replace(/United States/g, '+');
+                            console.log('calling post with '+encodedAddress);
+                            $.post('".APP_PATH_WEBROOT_FULL."/modules/vanderbilt_census_geocoder_v1.1/getAddress.php', { 'get':'address='+encodedAddress+'&benchmark=Public_AR_Census2010&vintage=Census2010_Census2010&layers=14&format=json' }, function(json) {
+                                var data = JSON.parse(json);
+                                console.log('got data '+typeof data);
+							    if (data && data['result'] && data['result']['addressMatches'] && data['result']['addressMatches'][0] && data['result']['addressMatches'][0]['geographies'] && data['result']['addressMatches'][0]['geographies']['Census Blocks']) {
+								    var lookupTable = data['result']['addressMatches'][0]['geographies']['Census Blocks'][0];
+								    for (var i=0; i < fields.length; i++) {
+									    if (lookupTable[keys[i]]) {
+                                            console.log('A Setting '+fields[i]+' to '+lookupTable[keys[i]]);
+										    $('[name=\"'+fields[i]+'\"]').val(lookupTable[keys[i]]);
+									    } else {
+                                            console.log('B Blanking '+fields[i]);
+										    $('[name=\"'+fields[i]+'\"]').val('');
+									    }
+								    }
+							    }
+                            });
 						}
 					}
-					$('#'".$addressField.").blur(function() {
+					$('[name=\"".$addressField."\"]').blur(function() {
+                        console.log('onblur');
 						downloadCensusData();
 					});
-				echo </script>";
+                });
+				</script>";
 			}
 		}
 	}
