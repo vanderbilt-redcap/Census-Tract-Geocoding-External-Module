@@ -11,10 +11,8 @@
     ],
 
 	"permissions": [
-		"hook_save_record",
-                "select_data",
-                "update_data",
-                "delete_data"
+		"hook_survey_page",
+		"hook_data_entry_form"
         ],
 
         "links": {
