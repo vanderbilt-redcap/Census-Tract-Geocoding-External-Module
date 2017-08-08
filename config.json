@@ -27,9 +27,6 @@
                 ]
         },
 
-	"global-settings": [
-	],
-	
 	"project-settings": [
 		{
 			"key": "address",
