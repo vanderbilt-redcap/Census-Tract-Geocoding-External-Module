@@ -1,4 +1,7 @@
-<?php namespace ExternalModules;
+<?php namespace Vanderbilt\CensusExternalModule;
+
+use ExternalModules\AbstractExternalModule;
+use ExternalModules\ExternalModules;
 
 class CensusExternalModule extends AbstractExternalModule
 {

@@ -1,6 +1,8 @@
 {
 	"name": "Census Geocoder",
 
+	"namespace": "Vanderbilt\\CensusExternalModule",
+
 	"description": "This module converts an address to a host of information about the address, available via a project link.",
 	
     "authors": [
