@@ -38,7 +38,7 @@
 		},
 		{
 			"key": "instrument",
-			"name": "When this Instrument is Saved, Call this Module",
+			"name": "Place on this Instrument",
 			"required": true,
 			"type": "form-list",
 			"repeatable": false
