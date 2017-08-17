@@ -14,7 +14,7 @@ class CensusExternalModule extends AbstractExternalModule
 	}
 
         function addScript($project_id, $record, $instrument, $event_id, $group_id, $survey_hash = null, $response_id = null) {
-            $module_data = ExternalModules::getProjectSettingsAsArray(array("vanderbilt_census_geocoder"), $project_id);
+            $module_data = ExternalModules::getProjectSettingsAsArray([$this->PREFIX], $project_id);
 		if ($project_id && ($instrument == $module_data["instrument"]['value'])) {
 			$addressField = $module_data['address']['value'];
 			$keys = $module_data['keys']['value'];
@@ -39,7 +39,7 @@ class CensusExternalModule extends AbstractExternalModule
 							var encodedAddress = address.replace(/\s+/g, '+');
 							encodedAddress = encodedAddress.replace(/United States/g, '+');
                             console.log('Looking up '+encodedAddress);
-                            $.post('".APP_PATH_WEBROOT_FULL."/modules/vanderbilt_census_geocoder_v1.1/getAddress.php', { 'get':'address='+encodedAddress+'&benchmark=Public_AR_Census2010&vintage=Census2010_Census2010&layers=14&format=json' }, function(json) {
+                            $.post('".$this->getUrl('getAddress.php')."', { 'get':'address='+encodedAddress+'&benchmark=Public_AR_Census2010&vintage=Census2010_Census2010&layers=14&format=json' }, function(json) {
                                 console.log('Got data from TigerWeb');
                                 var data = JSON.parse(json);
 							    if (data && data['result'] && data['result']['addressMatches'] && data['result']['addressMatches'][0] && data['result']['addressMatches'][0]['geographies'] && data['result']['addressMatches'][0]['geographies']['Census Blocks']) {
