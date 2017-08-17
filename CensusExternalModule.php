@@ -59,7 +59,10 @@ class CensusExternalModule extends AbstractExternalModule
                             });
 						}
 					}
-					$('[name=\"".$addressField."\"]').blur(function() {
+
+					// The following used to occur on the 'blur' event, but we switched it to 'change' since some
+					// modules update the field AFTER it has lost focus (like Address Autocompletion).
+					$('[name=\"".$addressField."\"]').change(function() {
                         console.log('Looking up Census data');
 						downloadCensusData();
 					});
