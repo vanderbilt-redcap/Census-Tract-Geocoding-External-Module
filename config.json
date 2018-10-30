@@ -37,6 +37,20 @@
 			"repeatable": false
 		},
 		{
+			"key": "latitude",
+			"name": "Field Containing the Latitude (if address not found)",
+			"required": false,
+			"type": "field-list",
+			"repeatable": false
+		},
+		{
+			"key": "longitude",
+			"name": "Field Containing the Longitude (if address not found)",
+			"required": false,
+			"type": "field-list",
+			"repeatable": false
+		},
+		{
 			"key": "instrument",
 			"name": "Place on this Instrument",
 			"required": true,
