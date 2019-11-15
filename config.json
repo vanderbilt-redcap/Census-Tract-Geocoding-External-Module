@@ -51,13 +51,6 @@
 			"repeatable": false
 		},
 		{
-			"key": "instrument",
-			"name": "Place on this Instrument",
-			"required": true,
-			"type": "form-list",
-			"repeatable": false
-		},
-		{
 			"key": "keys",
 			"name": "Data Key from TigerWeb Available Fields",
 			"required": false,

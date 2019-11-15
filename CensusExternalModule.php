@@ -15,7 +15,7 @@ class CensusExternalModule extends AbstractExternalModule
 
 		function addScript($project_id, $record, $instrument, $event_id, $group_id, $survey_hash = null, $response_id = null) {
 			$module_data = ExternalModules::getProjectSettingsAsArray([$this->PREFIX], $project_id);
-		if ($project_id && ($instrument == $module_data["instrument"]['value'])) {
+		if ($project_id) {
 			$addressField = $module_data['address']['value'];
 			$latitudeField = $module_data['latitude']['value'];
 			$longitudeField = $module_data['longitude']['value'];
@@ -53,6 +53,8 @@ class CensusExternalModule extends AbstractExternalModule
 					}
 
 					function downloadCensusDataFromLatLong() {
+						console.log('downloadCensusDataFromLatLong()')
+						
 						var latitude = $('[name=\"".$latitudeField."\"]').val();
 						var longitude = $('[name=\"".$longitudeField."\"]').val();
 
@@ -95,16 +97,22 @@ class CensusExternalModule extends AbstractExternalModule
 
 					// The following used to occur on the 'blur' event, but we switched it to 'change' since some
 					// modules update the field AFTER it has lost focus (like Address Autocompletion).
-					$('[name=\"".$addressField."\"]').change(function() {
-						console.log('Looking up Census data');
-						downloadCensusData();
-					});
-					$('[name=\"".$latitudeField."\"]').change(function() {
-						downloadCensusDataFromLatLong();
-					});
-					$('[name=\"".$longitudeField."\"]').change(function() {
-						downloadCensusDataFromLatLong();
-					});
+					if('$addressField'){
+						$('[name=\"".$addressField."\"]').change(function() {
+							console.log('Looking up Census data');
+							downloadCensusData();
+						});
+					}
+
+					if('$latitudeField' && '$longitudeField'){
+						$('[name=\"".$latitudeField."\"]').change(function() {
+							downloadCensusDataFromLatLong();
+						});
+
+						$('[name=\"".$longitudeField."\"]').change(function() {
+							downloadCensusDataFromLatLong();
+						});
+					}
 				});
 				</script>";
 			}
