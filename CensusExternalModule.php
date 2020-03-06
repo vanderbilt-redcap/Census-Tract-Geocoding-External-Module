@@ -9,7 +9,7 @@ class CensusExternalModule extends AbstractExternalModule
 		$this->addScript($project_id, $record, $instrument, $event_id, $group_id, $survey_hash, $response_id);
 	}
 
-	function hook_data_entry_form($project_id, $record, $instrument, $event_id, $group_id, $survey_hash, $response_id) {
+	function hook_data_entry_form($project_id, $record, $instrument, $event_id, $group_id, $survey_hash = null, $response_id = null) {
 		$this->addScript($project_id, $record, $instrument, $event_id, $group_id);
 	}
 
