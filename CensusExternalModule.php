@@ -32,7 +32,7 @@ class CensusExternalModule extends AbstractExternalModule
 				echo "<script>
 				$(document).ready(function() {
 					console.log('Census Geocoder loaded');
-					var sharedArgs = 'benchmark=Public_AR_Current&vintage=Current_Current&layers=14&format=json';
+					var sharedArgs = 'benchmark=Public_AR_Current&vintage=Current_Current&format=json';
 
 					function downloadCensusData() {
 						var address = $('[name=\"".$addressField."\"]').val();
@@ -45,9 +45,9 @@ class CensusExternalModule extends AbstractExternalModule
 								console.log('Got data from TigerWeb');
 								console.log(json);
 								var data = JSON.parse(json);
-								if (data && data['result'] && data['result']['addressMatches'] && data['result']['addressMatches'][0] && data['result']['addressMatches'][0]['geographies'] && data['result']['addressMatches'][0]['geographies']['Census Blocks']) {
+								if (data && data['result'] && data['result']['addressMatches'] && data['result']['addressMatches'][0] && data['result']['addressMatches'][0]['geographies'] && data['result']['addressMatches'][0]['geographies']['Census Tracts']) {
 									console.log('TigerWeb lookup data present');
-									var lookupTable = data['result']['addressMatches'][0]['geographies']['Census Blocks'][0];
+									var lookupTable = data['result']['addressMatches'][0]['geographies']['Census Tracts'][0];
 									processCensusData(lookupTable);
 								}
 							});
@@ -73,8 +73,8 @@ class CensusExternalModule extends AbstractExternalModule
 								console.log('Got coordinate data');
 								console.log(json);
 								var data = JSON.parse(json);
-								if(data && data['result'] && data['result']['geographies'] && data['result']['geographies']['Census Blocks']) {
-									var lookupTable = data['result']['geographies']['Census Blocks'][0];
+								if(data && data['result'] && data['result']['geographies'] && data['result']['geographies']['Census Tracts']) {
+									var lookupTable = data['result']['geographies']['Census Tracts'][0];
 									processCensusData(lookupTable);
 								}
 							});
