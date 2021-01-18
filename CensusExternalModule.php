@@ -99,6 +99,7 @@ class CensusExternalModule extends AbstractExternalModule
 							if(field.hasClass('rc-autocomplete')){
 								var autocompleteField = field.closest('td').find('.ui-autocomplete-input')
 								autocompleteField.val(field.find('option:selected').text())
+								autocompleteField.change()
 							}
 						}
 					}
