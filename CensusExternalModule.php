@@ -86,14 +86,20 @@ class CensusExternalModule extends AbstractExternalModule
 						var fields = ".json_encode($fields).";
 
 						for (var i=0; i < fields.length; i++) {
-							if (lookupTable[keys[i]]) {
-								console.log('Census Data Setting '+fields[i]+' to '+lookupTable[keys[i]]);
-								$('[name=\"'+fields[i]+'\"]').val(lookupTable[keys[i]]);
-							} else {
-								console.log('Setting '+fields[i]+' to \"\"');
-								$('[name=\"'+fields[i]+'\"]').val('');
+							var value = lookupTable[keys[i]]
+							if (!value) {
+								value = '';
 							}
-							$('[name=\"'+fields[i]+'\"]').change();
+							
+							console.log('Setting '+fields[i]+' to '+value);
+							var field = $('[name=\"'+fields[i]+'\"]');
+							field.val(value);
+							field.change();
+
+							if(field.hasClass('rc-autocomplete')){
+								var autocompleteField = field.closest('td').find('.ui-autocomplete-input')
+								autocompleteField.val(field.find('option:selected').text())
+							}
 						}
 					}
 
