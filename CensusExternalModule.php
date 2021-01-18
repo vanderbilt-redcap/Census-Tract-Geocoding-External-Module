@@ -32,6 +32,8 @@ class CensusExternalModule extends AbstractExternalModule
 				echo "<script>
 				$(document).ready(function() {
 					console.log('Census Geocoder loaded');
+					var sharedArgs = 'benchmark=Public_AR_Current&vintage=Current_Current&layers=14&format=json';
+
 					function downloadCensusData() {
 						var address = $('[name=\"".$addressField."\"]').val();
 
@@ -39,7 +41,7 @@ class CensusExternalModule extends AbstractExternalModule
 							var encodedAddress = address.replace(/\s+/g, '+');
 							encodedAddress = encodedAddress.replace(/United States/g, '+');
 							console.log('Looking up '+encodedAddress);
-							$.post('".$this->getUrl('getAddress.php')."', { 'get':'address='+encodedAddress+'&benchmark=Public_AR_Census2010&vintage=Census2010_Census2010&layers=14&format=json' }, function(json) {
+							$.post('".$this->getUrl('getAddress.php')."', { 'get':'address='+encodedAddress+'&'+sharedArgs }, function(json) {
 								console.log('Got data from TigerWeb');
 								console.log(json);
 								var data = JSON.parse(json);
@@ -64,7 +66,7 @@ class CensusExternalModule extends AbstractExternalModule
 							{
 								url:'".$this->getUrl('getCoordinates.php')."',
 								data:{
-									get:'benchmark=Public_AR_Census2010&vintage=Census2010_Census2010&layers=14&format=json&x=' + longitude + '&y=' + latitude
+									get: sharedArgs+'&x=' + longitude + '&y=' + latitude
 								},
 								type: 'POST'
 							}).done(function(json) {
