@@ -29,6 +29,8 @@ class CensusExternalModule extends AbstractExternalModule
 			}
 
 			if (count($keys) == count($fields)) {
+				echo '<script src="https://cdn.jsdelivr.net/npm/gasparesganga-jquery-loading-overlay@2.1.0/dist/loadingoverlay.min.js" integrity="sha384-MySkuCDi7dqpbJ9gSTKmmDIdrzNbnjT6QZ5cAgqdf1PeAYvSUde3uP8MGnBzuhUx"
+				crossorigin="anonymous"></script>';
 				echo "<script>
 				$(document).ready(function() {
 					console.log('Census Geocoder loaded');
@@ -62,6 +64,7 @@ class CensusExternalModule extends AbstractExternalModule
 
 						if(latitude && longitude) {
 							console.log('Looking up '+latitude+'/'+longitude);
+							$.LoadingOverlay('show')
 							$.ajax(
 							{
 								url:'".$this->getUrl('getCoordinates.php')."',
@@ -70,6 +73,7 @@ class CensusExternalModule extends AbstractExternalModule
 								},
 								type: 'POST'
 							}).done(function(json) {
+								$.LoadingOverlay('hide')
 								console.log('Got coordinate data');
 								console.log(json);
 								var data = JSON.parse(json);
