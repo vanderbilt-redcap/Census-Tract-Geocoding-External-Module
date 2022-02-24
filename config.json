@@ -3,6 +3,8 @@
 
 	"namespace": "Vanderbilt\\CensusExternalModule",
 
+	"framework-version": 7,
+
 	"description": "This module converts an address to a host of information about the address, available via a project link.",
 	
     "authors": [
@@ -22,8 +24,8 @@
                 "project": [
                         {
                                 "name": "Available Fields from Census Geocoder",
-                                "icon": "report",
-                                "url": "https://tigerweb.geo.census.gov/tigerwebmain/TIGERweb_attribute_glossary.html"
+                                "icon": "fas fa-file-alt",
+                                "url": "https://tigerweb.geo.census.gov/tigerwebmain/TIGERweb_attribute_glossary.html?"
                         }
                 ]
         },
