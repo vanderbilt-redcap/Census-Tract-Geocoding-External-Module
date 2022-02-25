@@ -14,6 +14,10 @@ class CensusExternalModule extends AbstractExternalModule
 	}
 
 	function redcap_every_page_before_render(){
+		if(PHP_SAPI === 'cli'){
+			return;
+		}
+
 		$expectedUrl = APP_URL_EXTMOD . 'manager/ajax/get-settings.php';
 		$actualUrl = $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST'] . $_SERVER['SCRIPT_NAME'];
 		if($expectedUrl !== $actualUrl){
