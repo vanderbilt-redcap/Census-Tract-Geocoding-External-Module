@@ -39,13 +39,6 @@ foreach($censuses as $census){
         $response = json_decode(ob_get_clean(), true);
         $lookupTable = $response['result']['addressMatches'][0]['geographies']['Census Blocks'][0];
 
-        if(empty($lookupTable)){
-            $message = "Error looking up address for record $recordId";
-            $module->log($message);
-            echo "$message\n";
-            continue;
-        }
-
         foreach($census['mappings'] as $mapping){
             $key = $mapping['keys'];
             $field = $mapping['fields'];
