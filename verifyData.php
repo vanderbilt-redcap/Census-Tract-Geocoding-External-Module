@@ -36,7 +36,8 @@ foreach($censuses as $census){
 
         ob_start();
         require __DIR__ . '/getAddress.php';
-        $lookupTable = json_decode(ob_get_clean(), true)['result']['addressMatches'][0]['geographies']['Census Tracts'][0];
+        $response = json_decode(ob_get_clean(), true);
+        $lookupTable = $response['result']['addressMatches'][0]['geographies']['Census Blocks'][0];
 
         foreach($census['mappings'] as $mapping){
             $key = $mapping['keys'];

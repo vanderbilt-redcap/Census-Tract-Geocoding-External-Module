@@ -94,9 +94,9 @@ class CensusExternalModule extends AbstractExternalModule
 								console.log('Got data from TigerWeb');
 								console.log(json);
 								var data = JSON.parse(json);
-								if (data && data['result'] && data['result']['addressMatches'] && data['result']['addressMatches'][0] && data['result']['addressMatches'][0]['geographies'] && data['result']['addressMatches'][0]['geographies']['Census Tracts']) {
+								if (data && data['result'] && data['result']['addressMatches'] && data['result']['addressMatches'][0] && data['result']['addressMatches'][0]['geographies'] && data['result']['addressMatches'][0]['geographies']['Census Blocks']) {
 									console.log('TigerWeb lookup data present');
-									var lookupTable = data['result']['addressMatches'][0]['geographies']['Census Tracts'][0];
+									var lookupTable = data['result']['addressMatches'][0]['geographies']['Census Blocks'][0];
 									processCensusData(lookupTable);
 								}
 							});
@@ -124,8 +124,8 @@ class CensusExternalModule extends AbstractExternalModule
 								console.log('Got coordinate data');
 								console.log(json);
 								var data = JSON.parse(json);
-								if(data && data['result'] && data['result']['geographies'] && data['result']['geographies']['Census Tracts']) {
-									var lookupTable = data['result']['geographies']['Census Tracts'][0];
+								if(data && data['result'] && data['result']['geographies'] && data['result']['geographies']['Census Blocks']) {
+									var lookupTable = data['result']['geographies']['Census Blocks'][0];
 									processCensusData(lookupTable);
 								}
 							});
