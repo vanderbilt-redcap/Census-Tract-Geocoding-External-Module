@@ -20,9 +20,26 @@ foreach($censuses as $census){
     }
 }
 
+$batchSize = (int) $_GET['batch-size'];
+if($batchSize === 0){
+    die('You must specify the "batch-size" parameter!');
+}
+
+$recordIds = array_column(json_decode(REDCap::getData([
+    'return_format' => 'json',
+    'fields' => 'stateid'
+]), true), 'stateid');
+
+$batches = array_chunk($recordIds, $batchSize);
+$recordIds = $batches[(int)$_GET['batch']] ?? null;
+if(!is_array($recordIds)){
+    die('Batch not found');
+}
+
 $records = json_decode(REDCap::getData([
     'return_format' => 'json',
-    'fields' => $fields
+    'fields' => $fields,
+    'records' => $recordIds
 ]), true);
 
 $dataToSave = [];
@@ -37,13 +54,13 @@ foreach($censuses as $census){
         ob_start();
         require __DIR__ . '/getAddress.php';
         $response = json_decode(ob_get_clean(), true);
-        $lookupTable = $response['result']['addressMatches'][0]['geographies']['Census Blocks'][0];
+        $lookupTable = $response['result']['addressMatches'][0]['geographies']['Census Blocks'][0] ?? [];
 
         foreach($census['mappings'] as $mapping){
             $key = $mapping['keys'];
             $field = $mapping['fields'];
 
-            $expected = $lookupTable[$key];
+            $expected = $lookupTable[$key] ?? null;
             $actual = $record[$field];
 
             if($expected != $actual){
@@ -51,7 +68,7 @@ foreach($censuses as $census){
                 $module->log($message);
                 echo "$message\n";
 
-                if(isset($_GET['save'])){
+                if(isset($_GET['save']) && $expected !== null){
                     $dataToSave[$recordId][$recordIdFieldName] = $recordId;
                     $dataToSave[$recordId][$field] = $expected;
                 }
