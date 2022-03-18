@@ -20,18 +20,29 @@ foreach($censuses as $census){
     }
 }
 
-$batchSize = (int) $_GET['batch-size'];
-if($batchSize === 0){
-    die('You must specify the "batch-size" parameter!');
-}
-
 $recordIds = array_column(json_decode(REDCap::getData([
     'return_format' => 'json',
     'fields' => 'stateid'
 ]), true), 'stateid');
 
+$id = $_GET['id'] ?? null;
+if($id === null){
+    $batchSize = (int) $_GET['batch-size'];
+    $batch = (int) $_GET['batch'];
+    if($batchSize === 0){
+        die('You must specify the "batch-size" parameter!');
+    }
+}
+else{
+    $batchSize = 1;
+    $batch = array_search($id, $recordIds);
+    if($batch === false){
+        die('Record ID not found');
+    }
+}
+
 $batches = array_chunk($recordIds, $batchSize);
-$recordIds = $batches[(int)$_GET['batch']] ?? null;
+$recordIds = $batches[$batch] ?? null;
 if(!is_array($recordIds)){
     die('Batch not found');
 }
@@ -46,7 +57,11 @@ $dataToSave = [];
 foreach($censuses as $census){
     foreach($records as $record){
         $recordId = $record[$recordIdFieldName];
-        $module->log('checking record ' . $recordId);
+        
+        $message = 'checking record ' . $recordId;
+        $module->log($message);
+        echo "$message\n";
+
         $address = $record[$addressFieldName];
         $address = str_replace(' ', '+', $address);
         $_POST['get'] = "address=$address&benchmark=Public_AR_Current&vintage=Census{$census['year']}_Current&format=json";
