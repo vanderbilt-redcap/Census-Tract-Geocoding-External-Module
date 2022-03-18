@@ -22,7 +22,8 @@ foreach($censuses as $census){
 
 $recordIds = array_column(json_decode(REDCap::getData([
     'return_format' => 'json',
-    'fields' => 'stateid'
+    'fields' => 'stateid',
+    'filterLogic' => '[geostatus] != "U" and [streetno] != ""'
 ]), true), 'stateid');
 
 $id = $_GET['id'] ?? null;
