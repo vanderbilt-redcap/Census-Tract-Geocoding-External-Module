@@ -24,18 +24,14 @@ class CensusExternalModule extends AbstractExternalModule
 			return;
 		}
 
-		$pid = $_POST['pid'] ?? null;
+		$pid = $_GET['pid'] ?? null;
 		if($pid === null){
 			// We're on the system settings
 			return;
 		}
 		else{
-			$_GET['pid'] = $pid;
-
 			// Make sure old settings get transitioned
 			$this->getCensuses();
-
-			unset($_GET['pid']);
 		}
 	}
 
