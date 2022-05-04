@@ -63,6 +63,10 @@ class CensusExternalModule extends AbstractExternalModule
 		return $censuses;
 	}
 
+	function getSharedArgs($censusYear){
+		return "benchmark=Public_AR_Current&vintage=Census{$censusYear}_Current&format=json";
+	}
+
 	function addScript($project_id, $record, $instrument, $event_id, $group_id, $survey_hash = null, $response_id = null) {
 		if ($project_id) {
 			$addressField = $this->getProjectSetting('address');
@@ -77,7 +81,7 @@ class CensusExternalModule extends AbstractExternalModule
 				echo "<script>
 				$(document).ready(function() {
 					console.log('Census Geocoder loaded');
-					var sharedArgs = 'benchmark=Public_AR_Current&vintage=Census{$census['year']}_Current&format=json';
+					var sharedArgs = " . json_encode($this->getSharedArgs($census['year'])) . ";
 
 					function downloadCensusData() {
 						var address = $('[name=\"".$addressField."\"]').val();

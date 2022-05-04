@@ -4,13 +4,24 @@ if(SUPER_USER !== '1'){
     die("You're not allowed to view this page!");
 }
 
+$log = function ($message){
+    global $module;
+
+    $module->log($message);
+    echo "$message\n";
+};
+
 echo '<pre>';
 
 $recordIdFieldName = $module->getRecordIdField();
 $addressFieldName = $module->getProjectSetting('address');
+$latitudeFieldName = $module->getProjectSetting('latitude');
+$longitudeFieldName = $module->getProjectSetting('longitude');
 $fields = [
     $recordIdFieldName,
-    $addressFieldName
+    $addressFieldName,
+    $latitudeFieldName,
+    $longitudeFieldName,
 ];
 
 $censuses = $module->getSubSettings('censuses');
@@ -55,22 +66,40 @@ $records = json_decode(REDCap::getData([
 ]), true);
 
 $dataToSave = [];
-foreach($censuses as $census){
-    foreach($records as $record){
-        $recordId = $record[$recordIdFieldName];
-        
-        $message = 'checking record ' . $recordId;
-        $module->log($message);
-        echo "$message\n";
+foreach($records as $record){
+    $recordId = $record[$recordIdFieldName];
 
-        $address = $record[$addressFieldName];
-        $address = str_replace(' ', '+', $address);
-        $_POST['get'] = "address=$address&benchmark=Public_AR_Current&vintage=Census{$census['year']}_Current&format=json";
+    $log('checking record ' . $recordId);
 
+    // $usingAddress = true;
+    // $address = $record[$addressFieldName];
+    // $address = str_replace(' ', '+', $address);
+
+    $usingAddress = false;
+    $latitude = $record[$latitudeFieldName];
+    $longitude = $record[$longitudeFieldName];
+    if(empty($latitude) || empty($longitude)){
+        $log("Record $recordId - GPS coordinates missing");
+        continue;
+    }
+
+    foreach($censuses as $census){    
         ob_start();
-        require __DIR__ . '/getAddress.php';
+        if($usingAddress){
+            $_POST['get'] = "address=$address&" . $module->getSharedArgs($census['year']);
+            require __DIR__ . '/getAddress.php';
+        }
+        else{
+            $_POST['get'] = "x=$longitude&y=$latitude&" . $module->getSharedArgs($census['year']);
+            require __DIR__ . '/getCoordinates.php';
+        }
         $response = json_decode(ob_get_clean(), true);
-        $lookupTable = $response['result']['addressMatches'][0]['geographies']['Census Blocks'][0] ?? [];
+        
+        $lookupTable = $response['result'];
+        if($usingAddress){
+            $lookupTable = $lookupTable['addressMatches'][0];
+        }
+        $lookupTable = $lookupTable['geographies']['Census Blocks'][0] ?? [];
 
         foreach($census['mappings'] as $mapping){
             $key = $mapping['keys'];
@@ -80,9 +109,7 @@ foreach($censuses as $census){
             $actual = $record[$field];
 
             if($expected != $actual){
-                $message = "Record $recordId - Field $field - Expected '$expected', but found '$actual'";
-                $module->log($message);
-                echo "$message\n";
+                $log("Record $recordId - Field $field - Expected '$expected', but found '$actual'");
 
                 if(isset($_GET['save']) && $expected !== null){
                     $dataToSave[$recordId][$recordIdFieldName] = $recordId;
