@@ -84,16 +84,31 @@ foreach($records as $record){
     }
 
     foreach($censuses as $census){    
-        ob_start();
-        if($usingAddress){
-            $_POST['get'] = "address=$address&" . $module->getSharedArgs($census['year']);
-            require __DIR__ . '/getAddress.php';
+        $tries = 0;
+        while(true){
+            ob_start();
+            if($usingAddress){
+                $_POST['get'] = "address=$address&" . $module->getSharedArgs($census['year']);
+                require __DIR__ . '/getAddress.php';
+            }
+            else{
+                $_POST['get'] = "x=$longitude&y=$latitude&" . $module->getSharedArgs($census['year']);
+                require __DIR__ . '/getCoordinates.php';
+            }
+
+            $response = json_decode(ob_get_clean(), true);
+            if(!isset($response['exceptions'])){
+                // The request succeeded!
+                break;
+            }
+
+            $tries++;
+            if($tries === 3){
+                $log("Census API error after $tries retries:");
+                var_dump($response);
+                die();
+            }
         }
-        else{
-            $_POST['get'] = "x=$longitude&y=$latitude&" . $module->getSharedArgs($census['year']);
-            require __DIR__ . '/getCoordinates.php';
-        }
-        $response = json_decode(ob_get_clean(), true);
         
         $lookupTable = $response['result'];
         if($usingAddress){
