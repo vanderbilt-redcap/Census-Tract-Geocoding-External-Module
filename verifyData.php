@@ -103,7 +103,7 @@ foreach($records as $record){
             }
 
             $tries++;
-            if($tries === 3){
+            if($tries === 10){
                 $log("Census API error after $tries retries:");
                 var_dump($response);
                 die();
