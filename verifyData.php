@@ -37,6 +37,16 @@ $recordIds = array_column(json_decode(REDCap::getData([
     'filterLogic' => '[geostatus] != "U" and [streetno] != ""'
 ]), true), 'stateid');
 
+$startingRecord = $_GET['starting-record'] ?? false;
+if($startingRecord){
+    $startingRecordIndex = array_search($startingRecord, $recordIds);
+    if($startingRecordIndex === false){
+        die('Starting record not found!');
+    }
+
+    $recordIds = array_slice($recordIds, $startingRecordIndex);
+}
+
 $id = $_GET['id'] ?? null;
 if($id === null){
     $batchSize = (int) $_GET['batch-size'];
