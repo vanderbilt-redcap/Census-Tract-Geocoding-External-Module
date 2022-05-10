@@ -39,6 +39,15 @@ class CensusExternalModule extends AbstractExternalModule
 		$keys = $this->getProjectSetting('keys');
 		$fields = $this->getProjectSetting('fields');
 
+		if($fields === null){
+			/**
+			 * Do nothing.  This project has not been configured, and does not need settings to be transitioned.
+			 * This was added to fix an odd subsetting display issue caused by setting 'mappings' to '[[]]',
+			 * when they would normally be set to '[[null]]' when a single null 'fields' value exists.
+			 */
+			return;
+		}
+
 		$this->setProjectSetting('year', ['2020']);
 		$this->setProjectSetting('censuses', ['true']);
 
