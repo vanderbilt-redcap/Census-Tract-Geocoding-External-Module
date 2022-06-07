@@ -31,11 +31,12 @@ foreach($censuses as $census){
     }
 }
 
+$recordIdFieldName = $module->getRecordIdField();
 $recordIds = array_column(json_decode(REDCap::getData([
     'return_format' => 'json',
-    'fields' => $module->getRecordIdField(),
+    'fields' => $recordIdFieldName,
     'filterLogic' => '[geostatus] != "U" and [streetno] != ""'
-]), true), 'stateid');
+]), true), $recordIdFieldName);
 
 $startingRecord = $_GET['starting-record'] ?? false;
 if($startingRecord){
