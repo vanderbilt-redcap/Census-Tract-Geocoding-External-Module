@@ -31,22 +31,11 @@ foreach($censuses as $census){
     }
 }
 
-$metadata = (new \Project())->metadata;
-foreach(['streetno', 'street_number'] as $fieldName){
-    if(isset($metadata[$fieldName])){
-        $streetNumberFieldName = $fieldName;
-    }
-}
-
-if(!isset($streetNumberFieldName)){
-    die('Street number field name not found!');
-}
-
 $recordIdFieldName = $module->getRecordIdField();
 $recordIds = array_column(json_decode(REDCap::getData([
     'return_format' => 'json',
     'fields' => $recordIdFieldName,
-    'filterLogic' => "[geostatus] != 'U' and [$streetNumberFieldName] != ''"
+    'filterLogic' => "[geostatus] != 'U'"
 ]), true), $recordIdFieldName);
 
 $startingRecord = $_GET['starting-record'] ?? false;
