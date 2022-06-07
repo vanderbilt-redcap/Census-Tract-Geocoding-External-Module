@@ -93,17 +93,12 @@ foreach($records as $record){
 
     $log('checking record ' . $recordId);
 
-    // $usingAddress = true;
-    // $address = $record[$addressFieldName];
-    // $address = str_replace(' ', '+', $address);
-
-    $usingAddress = false;
+    $address = $record[$addressFieldName];
+    $address = str_replace(' ', '+', $address);
     $latitude = $record[$latitudeFieldName];
     $longitude = $record[$longitudeFieldName];
-    if(empty($latitude) || empty($longitude)){
-        $log("Record $recordId - GPS coordinates missing");
-        continue;
-    }
+
+    $usingAddress = empty($latitude) || empty($longitude);
 
     foreach($censuses as $census){    
         $tries = 0;
