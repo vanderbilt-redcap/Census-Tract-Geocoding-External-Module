@@ -96,8 +96,7 @@ class CensusExternalModule extends AbstractExternalModule
 						var address = $('[name=\"".$addressField."\"]').val();
 
 						if (address) {
-							var encodedAddress = address.replace(/\s+/g, '+');
-							encodedAddress = encodedAddress.replace(/United States/g, '+');
+							var encodedAddress = address.replace(/United States/g, '');
 							console.log('Looking up '+encodedAddress);
 							$.post('".$this->getUrl('getAddress.php')."', { 'get':1,'address':encodedAddress, 'year': year}, function(json) {
 								console.log('Got data from TigerWeb');
@@ -125,6 +124,7 @@ class CensusExternalModule extends AbstractExternalModule
 							{
 								url:'".$this->getUrl('getCoordinates.php')."',
 								data:{
+									get: 1,
 									lat: latitude,
 									long: longitude,
 									year: year
