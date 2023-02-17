@@ -94,11 +94,16 @@ foreach($records as $record){
         while(true){
             ob_start();
             if($usingAddress){
-                $_POST['get'] = "address=$address&" . $module->getSharedArgs($census['year']);
+				$_POST['get'] = true;
+				$_POST['address'] = $address;
+				$_POST['year'] = $census['year'];
                 require __DIR__ . '/getAddress.php';
             }
             else{
-                $_POST['get'] = "x=$longitude&y=$latitude&" . $module->getSharedArgs($census['year']);
+                $_POST['get'] = true;
+				$_POST['lat'] = $latitude;
+				$_POST['long'] = $longitude;
+				$_POST['year'] = $census['year'];
                 require __DIR__ . '/getCoordinates.php';
             }
 

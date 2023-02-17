@@ -1,7 +1,9 @@
 <?php
 
 if ($_POST['get']) {
-    $url = 'https://geocoding.geo.census.gov/geocoder/geographies/onelineaddress?'.$_POST['get'];
+	$address = url_encode(preg_replace("/[^a-zA-Z0-9 ,]/","",$_POST['address']));
+	$year = $_POST['year'];
+    $url = 'https://geocoding.geo.census.gov/geocoder/geographies/onelineaddress?address='.$address.'&'.$module->getSharedArgs($census['year']);
     $ch = curl_init();
     curl_setopt($ch, CURLOPT_URL, $url);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);

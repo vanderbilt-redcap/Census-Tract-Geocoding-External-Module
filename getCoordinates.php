@@ -1,7 +1,10 @@
 <?php
 
 if ($_POST['get']) {
-	$url = 'https://geocoding.geo.census.gov/geocoder/geographies/coordinates?'.$_POST['get'];
+	$lat = (float)$_POST['lat'];
+	$long = (float)$_POST['long'];
+	$year = $_POST['year'];
+	$url = 'https://geocoding.geo.census.gov/geocoder/geographies/coordinates?y='.$lat.'&x='.$long."&".$module->getSharedArgs($year);
 	$ch = curl_init();
 	curl_setopt($ch, CURLOPT_URL, $url);
 	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);

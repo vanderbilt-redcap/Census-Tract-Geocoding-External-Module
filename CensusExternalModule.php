@@ -73,7 +73,7 @@ class CensusExternalModule extends AbstractExternalModule
 	}
 
 	function getSharedArgs($censusYear){
-		return "benchmark=Public_AR_Current&vintage=Census{$censusYear}_Current&format=json";
+		return "benchmark=Public_AR_Current&vintage=Census".((int)$censusYear)."_Current&format=json";
 	}
 
 	function addScript($project_id, $record, $instrument, $event_id, $group_id, $survey_hash = null, $response_id = null) {
@@ -90,7 +90,7 @@ class CensusExternalModule extends AbstractExternalModule
 				echo "<script>
 				$(document).ready(function() {
 					console.log('Census Geocoder loaded');
-					var sharedArgs = " . json_encode($this->getSharedArgs($census['year'])) . ";
+					var year = " . (int)$census['year'] . ";
 
 					function downloadCensusData() {
 						var address = $('[name=\"".$addressField."\"]').val();
@@ -99,7 +99,7 @@ class CensusExternalModule extends AbstractExternalModule
 							var encodedAddress = address.replace(/\s+/g, '+');
 							encodedAddress = encodedAddress.replace(/United States/g, '+');
 							console.log('Looking up '+encodedAddress);
-							$.post('".$this->getUrl('getAddress.php')."', { 'get':'address='+encodedAddress+'&'+sharedArgs }, function(json) {
+							$.post('".$this->getUrl('getAddress.php')."', { 'get':1,'address':encodedAddress, 'year': year}, function(json) {
 								console.log('Got data from TigerWeb');
 								console.log(json);
 								var data = JSON.parse(json);
@@ -125,7 +125,9 @@ class CensusExternalModule extends AbstractExternalModule
 							{
 								url:'".$this->getUrl('getCoordinates.php')."',
 								data:{
-									get: sharedArgs+'&x=' + longitude + '&y=' + latitude
+									lat: latitude,
+									long: longitude,
+									year: year
 								},
 								type: 'POST'
 							}).done(function(json) {
