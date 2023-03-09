@@ -12,7 +12,17 @@
             "name": "Scott J. Pearson",
             "email": "datacore@vumc.org",
             "institution": "Vanderbilt University Medical Center"
-        }
+        },
+		{
+		  "name": "Mark McEver",
+		  "email": "datacore@vumc.org",
+		  "institution": "Vanderbilt University Medical Center"
+		},
+		{
+		  "name": "Kyle McGuffin",
+		  "email": "datacore@vumc.org",
+		  "institution": "Vanderbilt University Medical Center"
+		}
     ],
 
 	"permissions": [
