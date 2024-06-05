@@ -76,6 +76,7 @@
 					"name": "Year",
 					"type": "dropdown",
 					"choices": [
+						{ "value": "current", "name": "Current" },
 						{ "value": "2020", "name": "2020" },
 						{ "value": "2010", "name": "2010" }
 					]
