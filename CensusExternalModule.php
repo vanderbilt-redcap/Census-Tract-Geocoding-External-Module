@@ -73,11 +73,6 @@ class CensusExternalModule extends AbstractExternalModule
 	}
 
 	function getSharedArgs($censusYear){
-		// NOTE: int casting on non-numeric strings (and nulls) defaults to 0
-		// thus current census data is effectively default behavior
-		if ((int)$censusYear === 0) {
-			return "benchmark=Public_AR_Current&vintage=Current_Current&format=json";
-		}
 		return "benchmark=Public_AR_Current&vintage=Census".((int)$censusYear)."_Current&format=json";
 	}
 
