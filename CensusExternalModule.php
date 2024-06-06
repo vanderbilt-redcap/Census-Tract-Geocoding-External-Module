@@ -5,6 +5,10 @@ use ExternalModules\ExternalModules;
 
 class CensusExternalModule extends AbstractExternalModule
 {
+	// When using the Public_AR_Current benchmark, the "vintage" parameter for some years do not follow the format "Census<year>_Current" but rather "ACS<year>_Current"
+	// Note that the "Current_Current" vintage has caused data corruption issues and should not be implemented
+	const ACSX_CURRENT_YEARS = [2023];
+
 	function hook_survey_page($project_id, $record, $instrument, $event_id, $group_id, $survey_hash, $response_id) {
 		$this->addScript($project_id, $record, $instrument, $event_id, $group_id, $survey_hash, $response_id);
 	}
@@ -73,7 +77,11 @@ class CensusExternalModule extends AbstractExternalModule
 	}
 
 	function getSharedArgs($censusYear){
-		return "benchmark=Public_AR_Current&vintage=Census".((int)$censusYear)."_Current&format=json";
+		$censusYearInt = ((int)$censusYear);
+		if (in_array($censusYearInt, self::ACSX_CURRENT_YEARS)) {
+			return "benchmark=Public_AR_ACS".$censusYearInt."&vintage=Current_ACS".$censusYearInt."&format=json";
+		}
+		return "benchmark=Public_AR_Current&vintage=Census".$censusYearInt."_Current&format=json";
 	}
 
 	function addScript($project_id, $record, $instrument, $event_id, $group_id, $survey_hash = null, $response_id = null) {
@@ -102,6 +110,8 @@ class CensusExternalModule extends AbstractExternalModule
 								console.log('Got data from TigerWeb');
 								console.log(json);
 								var data = JSON.parse(json);
+								// NOTE: benchmark:Public_AR_ACS<year>, vintage=Current_ACS<year> data is has its 'Census Blocks' data prefixed with the year the data is actually sourced from
+								// TODO: account for the most recent applicable year (2020 Census Blocks for 2023 data)
 								if (data && data['result'] && data['result']['addressMatches'] && data['result']['addressMatches'][0] && data['result']['addressMatches'][0]['geographies'] && data['result']['addressMatches'][0]['geographies']['Census Blocks']) {
 									console.log('TigerWeb lookup data present');
 									var lookupTable = data['result']['addressMatches'][0]['geographies']['Census Blocks'][0];

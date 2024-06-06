@@ -76,6 +76,7 @@
 					"name": "Year",
 					"type": "dropdown",
 					"choices": [
+						{ "value": "2023", "name": "2023" },
 						{ "value": "2020", "name": "2020" },
 						{ "value": "2010", "name": "2010" }
 					]
