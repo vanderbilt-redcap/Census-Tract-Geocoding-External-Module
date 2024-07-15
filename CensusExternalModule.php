@@ -73,7 +73,20 @@ class CensusExternalModule extends AbstractExternalModule
 	}
 
 	function getSharedArgs($censusYear){
-		return "benchmark=Public_AR_Current&vintage=Census".((int)$censusYear)."_Current&format=json";
+		$censusYear = (int)$censusYear;
+		// NOTE: The US census is conducted every 10 years on years ending in 0
+		$mostRecentCensusYear = floor($censusYear / 10) * 10;
+		if ($mostRecentCensusYear !== $censusYear) {
+			// NOTE: vintage Census<mostRecentCensusYear> is chosen for similarity to Census2020_Current scheme, namely the presence of data in "Census Blocks" field of API results
+			// see comments on related PR for further details
+			// https://github.com/vanderbilt-redcap/Census-Tract-Geocoding-External-Module/pull/3
+			$benchmark = "Public_AR_ACS{$censusYear}";
+			$vintage = "Census{$mostRecentCensusYear}_ACS{$censusYear}";
+		} else {
+			$benchmark = "Public_AR_Current";
+			$vintage = "Census{$censusYear}_Current";
+		}
+		return "benchmark={$benchmark}&vintage={$vintage}&format=json";
 	}
 
 	function addScript($project_id, $record, $instrument, $event_id, $group_id, $survey_hash = null, $response_id = null) {
