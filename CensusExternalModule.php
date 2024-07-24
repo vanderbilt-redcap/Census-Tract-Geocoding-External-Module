@@ -75,7 +75,7 @@ class CensusExternalModule extends AbstractExternalModule
 	function getSharedArgs($censusYear){
 		$censusYear = (int)$censusYear;
 		// NOTE: The US census is conducted every 10 years on years ending in 0
-		$mostRecentCensusYear = floor($censusYear / 10) * 10;
+		$mostRecentCensusYear = (int) (floor($censusYear / 10) * 10);
 		if ($mostRecentCensusYear !== $censusYear) {
 			// NOTE: vintage Census<mostRecentCensusYear> is chosen for similarity to Census2020_Current scheme, namely the presence of data in "Census Blocks" field of API results
 			// see comments on related PR for further details
