@@ -76,12 +76,16 @@ class CensusExternalModule extends AbstractExternalModule
 		$censusYear = (int)$censusYear;
 		// NOTE: The US census is conducted every 10 years on years ending in 0
 		$mostRecentCensusYear = (int) (floor($censusYear / 10) * 10);
-		if ($mostRecentCensusYear !== $censusYear) {
+		// HACK: US Census site eliminated most vintages and benchmarks in August 2024
+		if (!in_array($censusYear, [2010, 2020])) { $censusYear = $mostRecentCensusYear; }
+		if ($mostRecentCensusYear == $censusYear) {
 			// NOTE: vintage Census<mostRecentCensusYear> is chosen for similarity to Census2020_Current scheme, namely the presence of data in "Census Blocks" field of API results
 			// see comments on related PR for further details
 			// https://github.com/vanderbilt-redcap/Census-Tract-Geocoding-External-Module/pull/4
-			$benchmark = "Public_AR_ACS{$censusYear}";
-			$vintage = "Census{$mostRecentCensusYear}_ACS{$censusYear}";
+			// HACK: At the release of ACS 2024, all other ACS benchmarks were eliminated as well as all non ACS2024 vintages
+			$ACS_year = 2024;
+			$benchmark = "Public_AR_ACS{$ACS_year}";
+			$vintage = "Census{$mostRecentCensusYear}_ACS{$ACS_year}";
 		} else {
 			$benchmark = "Public_AR_Current";
 			$vintage = "Census{$censusYear}_Current";
