@@ -77,7 +77,6 @@
 					"type": "dropdown",
 					"developer_comment": "Please do not attempt to add a 'current' choice; despite census.gov supporting it, this has broken things in the past due to changes in their API",
 					"choices": [
-						{ "value": "2023", "name": "2023" },
 						{ "value": "2020", "name": "2020" },
 						{ "value": "2010", "name": "2010" }
 					]
