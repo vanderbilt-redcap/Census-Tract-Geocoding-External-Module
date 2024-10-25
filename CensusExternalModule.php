@@ -5,12 +5,56 @@ use ExternalModules\ExternalModules;
 
 class CensusExternalModule extends AbstractExternalModule
 {
-	function hook_survey_page($project_id, $record, $instrument, $event_id, $group_id, $survey_hash, $response_id) {
+	const BENCHMARKS_URL = "https://geocoding.geo.census.gov/geocoder/benchmarks";
+	const VINTAGES_URL = "https://geocoding.geo.census.gov/geocoder/vintages?benchmark=";
+
+	function redcap_survey_page($project_id, $record, $instrument, $event_id, $group_id, $survey_hash, $response_id) {
 		$this->addScript($project_id, $record, $instrument, $event_id, $group_id, $survey_hash, $response_id);
 	}
 
-	function hook_data_entry_form($project_id, $record, $instrument, $event_id, $group_id, $survey_hash = null, $response_id = null) {
+	function redcap_data_entry_form($project_id, $record, $instrument, $event_id, $group_id, $survey_hash = null, $response_id = null) {
 		$this->addScript($project_id, $record, $instrument, $event_id, $group_id);
+	}
+
+	function redcap_module_configuration_settings($project_id, $settings): array {
+		$combo_choices = $this->generateBenchmarkVintageChoices();
+
+		$census_idx = array_search("censuses", array_column($settings, "key"));
+		$bv_idx = array_search("benchmark_vintage", array_column($settings[$census_idx]["sub_settings"], "key"));
+
+		$settings[$census_idx]["sub_settings"][$bv_idx]["choices"] = $combo_choices;
+
+		return $settings;
+	}
+
+	function generateBenchmarkVintageChoices(): array {
+		$benchmarks_from_api = json_decode(file_get_contents($this::BENCHMARKS_URL), 1)["benchmarks"];
+
+		$combo_choices = [];
+
+		foreach ($benchmarks_from_api as $benchmark) {
+			$vintages = [];
+			$this_benchmark_name = $benchmark["benchmarkName"];
+
+			// NOTE: this can be quite slow, if this becomes a problem consider caching and setting up a cron to refresh these
+			$vintages = json_decode(file_get_contents($this::VINTAGES_URL . $benchmark["id"]), 1)["vintages"];
+
+			foreach($vintages as $vintage) {
+				$vintage_choice = [
+					"name" => $this_benchmark_name . " - " . $vintage["vintageName"],
+					"value" => $this_benchmark_name . " - " . $vintage["vintageName"]
+				];
+
+				if ($vintage['isDefault']) {
+					// bubble defaults to top
+					array_unshift($combo_choices, $vintage_choice);
+				} else {
+					$combo_choices[] = $vintage_choice;
+				}
+			}
+
+		}
+		return $combo_choices;
 	}
 
 	function redcap_every_page_before_render(){
@@ -64,7 +108,7 @@ class CensusExternalModule extends AbstractExternalModule
 
 	function getCensuses(){
 		$censuses = $this->getSubSettings('censuses');
-		if(!isset($censuses[0]['year'])){
+		if (!isset($censuses[0]['year']) && !isset($censuses[0]['benchmark_vintage'])) {
 			$this->transitionOldSettings();
 			$censuses = $this->getSubSettings('censuses');
 		}
@@ -72,7 +116,16 @@ class CensusExternalModule extends AbstractExternalModule
 		return $censuses;
 	}
 
-	function getSharedArgs($censusYear){
+	function getSharedArgsBenchmark($benchmark_vintage) {
+		[$benchmark, $vintage] = explode(" - ", $benchmark_vintage);
+
+		return "benchmark={$benchmark}&vintage={$vintage}&format=json";
+	}
+
+	/*
+	 * @deprecated 2.0.0 The "year" option is no longer visible in the configuration settings
+	 */
+	function getSharedArgsYear($censusYear){
 		$censusYear = (int)$censusYear;
 		// NOTE: The US census is conducted every 10 years on years ending in 0
 		$mostRecentCensusYear = (int) (floor($censusYear / 10) * 10);

@@ -50,7 +50,7 @@
 			"required": true,
 			"type": "field-list",
 			"repeatable": false,
-            "autocomplete": true
+      "autocomplete": true
 		},
 		{
 			"key": "latitude",
@@ -58,7 +58,7 @@
 			"required": false,
 			"type": "field-list",
 			"repeatable": false,
-            "autocomplete": true
+      "autocomplete": true
 		},
 		{
 			"key": "longitude",
@@ -66,7 +66,7 @@
 			"required": false,
 			"type": "field-list",
 			"repeatable": false,
-            "autocomplete": true
+      "autocomplete": true
 		},
 		{
 			"key": "censuses",
@@ -78,11 +78,19 @@
 					"key": "year",
 					"name": "Year",
 					"type": "dropdown",
-					"developer_comment": "Please do not attempt to add a 'current' choice; despite census.gov supporting it, this has broken things in the past due to changes in their API",
+					"developer_comment": "Deprecated in version 2 but retained to allow version 1 modules to function without configuration update",
+          "hidden": true,
 					"choices": [
 						{ "value": "2020", "name": "2020" },
 						{ "value": "2010", "name": "2010" }
 					]
+				},
+				{
+					"key": "benchmark_vintage",
+					"name": "Benchmark - Vintage",
+					"type": "dropdown",
+					"choices": [],
+          "autocomplete": true
 				},
 				{
 					"key": "mappings",
