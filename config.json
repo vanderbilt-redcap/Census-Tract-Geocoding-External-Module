@@ -49,21 +49,24 @@
 			"name": "Field Containing the Full Address",
 			"required": true,
 			"type": "field-list",
-			"repeatable": false
+			"repeatable": false,
+            "autocomplete": true
 		},
 		{
 			"key": "latitude",
 			"name": "Field Containing the Latitude (if address not found)",
 			"required": false,
 			"type": "field-list",
-			"repeatable": false
+			"repeatable": false,
+            "autocomplete": true
 		},
 		{
 			"key": "longitude",
 			"name": "Field Containing the Longitude (if address not found)",
 			"required": false,
 			"type": "field-list",
-			"repeatable": false
+			"repeatable": false,
+            "autocomplete": true
 		},
 		{
 			"key": "censuses",
@@ -209,12 +212,14 @@
 								{ "value": "ZCTA5CC", "name": "ZCTA Class Code (ZIP Code Tabulation Area FIPS Class Code)" },
 								{ "value": "ZCTA5", "name": "Zip Code Tabulation Area Code (Zip Code Tabulation Area Code)" },
 								{ "value": "ZIP", "name": "ZIP Code (ZIP Code)" }
-							]
+							],
+                            "autocomplete": true
 						},
 						{
 							"key": "fields",
 							"name": "Field to Populate with Corresponding Data Key",
-							"type": "field-list"
+							"type": "field-list",
+                            "autocomplete": true
 						}
 					]
 				}
