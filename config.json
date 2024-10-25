@@ -3,7 +3,7 @@
 
 	"namespace": "Vanderbilt\\CensusExternalModule",
 
-	"framework-version": 7,
+	"framework-version": 16,
 
 	"description": "This module converts an address to a host of information about the address, available via a project link.",
 	
@@ -24,12 +24,6 @@
 		  "institution": "Vanderbilt University Medical Center"
 		}
     ],
-
-	"permissions": [
-		"hook_survey_page",
-		"hook_data_entry_form",
-		"redcap_every_page_before_render"
-	],
 
 	"enable-every-page-hooks-on-system-pages": true,
 
