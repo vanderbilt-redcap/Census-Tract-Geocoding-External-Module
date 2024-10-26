@@ -6,7 +6,7 @@ if ($_POST['get']) {
 	$year = $_POST['year'];
 	$benchmark_vintage = $_POST['benchmark_vintage'];
 	if ($benchmark_vintage) {
-		$url = 'https://geocoding.geo.census.gov/geocoder/geographies/coordinates?y='.$lat.'&x='.$long."&".$module->getSharedArgsBenchmark($year);
+		$url = 'https://geocoding.geo.census.gov/geocoder/geographies/coordinates?y='.$lat.'&x='.$long."&".$module->getSharedArgsBenchmark($benchmark_vintage);
 	} else {
 		$url = 'https://geocoding.geo.census.gov/geocoder/geographies/coordinates?y='.$lat.'&x='.$long."&".$module->getSharedArgsYear($year);
 	}
