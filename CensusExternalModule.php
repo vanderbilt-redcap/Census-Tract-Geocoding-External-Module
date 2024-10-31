@@ -150,8 +150,6 @@ class CensusExternalModule extends AbstractExternalModule
 		if (!$project_id) { return; }
 		$this->initializeJavascriptModuleObject();
 
-		echo "<script> const module = " . $this->getJavascriptModuleObjectName() . "</script>";
-
 		$censuses = $this->getCensuses();
 
 		$this->tt_addToJavascriptModuleObject("censuses", $censuses);
