@@ -5,12 +5,56 @@ use ExternalModules\ExternalModules;
 
 class CensusExternalModule extends AbstractExternalModule
 {
-	function hook_survey_page($project_id, $record, $instrument, $event_id, $group_id, $survey_hash, $response_id) {
+	const BENCHMARKS_URL = "https://geocoding.geo.census.gov/geocoder/benchmarks";
+	const VINTAGES_URL = "https://geocoding.geo.census.gov/geocoder/vintages?benchmark=";
+
+	function redcap_survey_page($project_id, $record, $instrument, $event_id, $group_id, $survey_hash, $response_id) {
 		$this->addScript($project_id, $record, $instrument, $event_id, $group_id, $survey_hash, $response_id);
 	}
 
-	function hook_data_entry_form($project_id, $record, $instrument, $event_id, $group_id, $survey_hash = null, $response_id = null) {
+	function redcap_data_entry_form($project_id, $record, $instrument, $event_id, $group_id, $survey_hash = null, $response_id = null) {
 		$this->addScript($project_id, $record, $instrument, $event_id, $group_id);
+	}
+
+	function redcap_module_configuration_settings($project_id, $settings): array {
+		$combo_choices = $this->generateBenchmarkVintageChoices();
+
+		$census_idx = array_search("censuses", array_column($settings, "key"));
+		$bv_idx = array_search("benchmark_vintage", array_column($settings[$census_idx]["sub_settings"], "key"));
+
+		$settings[$census_idx]["sub_settings"][$bv_idx]["choices"] = $combo_choices;
+
+		return $settings;
+	}
+
+	function generateBenchmarkVintageChoices(): array {
+		$benchmarks_from_api = json_decode(file_get_contents($this::BENCHMARKS_URL), 1)["benchmarks"];
+
+		$combo_choices = [];
+
+		foreach ($benchmarks_from_api as $benchmark) {
+			$vintages = [];
+			$this_benchmark_name = $benchmark["benchmarkName"];
+
+			// NOTE: this can be quite slow, if this becomes a problem consider caching and setting up a cron to refresh these
+			$vintages = json_decode(file_get_contents($this::VINTAGES_URL . $benchmark["id"]), 1)["vintages"];
+
+			foreach($vintages as $vintage) {
+				$vintage_choice = [
+					"name" => $this_benchmark_name . " - " . $vintage["vintageName"],
+					"value" => $this_benchmark_name . " - " . $vintage["vintageName"]
+				];
+
+				if ($vintage['isDefault']) {
+					// bubble defaults to top
+					array_unshift($combo_choices, $vintage_choice);
+				} else {
+					$combo_choices[] = $vintage_choice;
+				}
+			}
+
+		}
+		return $combo_choices;
 	}
 
 	function redcap_every_page_before_render(){
@@ -64,7 +108,7 @@ class CensusExternalModule extends AbstractExternalModule
 
 	function getCensuses(){
 		$censuses = $this->getSubSettings('censuses');
-		if(!isset($censuses[0]['year'])){
+		if (!isset($censuses[0]['year']) && !isset($censuses[0]['benchmark_vintage'])) {
 			$this->transitionOldSettings();
 			$censuses = $this->getSubSettings('censuses');
 		}
@@ -72,7 +116,16 @@ class CensusExternalModule extends AbstractExternalModule
 		return $censuses;
 	}
 
-	function getSharedArgs($censusYear){
+	function getSharedArgsBenchmark($benchmark_vintage) {
+		[$benchmark, $vintage] = explode(" - ", $benchmark_vintage);
+
+		return "benchmark={$benchmark}&vintage={$vintage}&format=json";
+	}
+
+	/*
+	 * @deprecated 2.0.0 The "year" option is no longer visible in the configuration settings
+	 */
+	function getSharedArgsYear($censusYear){
 		$censusYear = (int)$censusYear;
 		// NOTE: The US census is conducted every 10 years on years ending in 0
 		$mostRecentCensusYear = (int) (floor($censusYear / 10) * 10);
@@ -94,117 +147,29 @@ class CensusExternalModule extends AbstractExternalModule
 	}
 
 	function addScript($project_id, $record, $instrument, $event_id, $group_id, $survey_hash = null, $response_id = null) {
-		if ($project_id) {
-			$addressField = $this->getProjectSetting('address');
-			$latitudeField = $this->getProjectSetting('latitude');
-			$longitudeField = $this->getProjectSetting('longitude');
+		if (!$project_id) { return; }
+		$this->initializeJavascriptModuleObject();
 
-			$censuses = $this->getCensuses();
+		$censuses = $this->getCensuses();
 
-			foreach($censuses as $census){
-				echo '<script src="https://cdn.jsdelivr.net/npm/gasparesganga-jquery-loading-overlay@2.1.0/dist/loadingoverlay.min.js" integrity="sha384-MySkuCDi7dqpbJ9gSTKmmDIdrzNbnjT6QZ5cAgqdf1PeAYvSUde3uP8MGnBzuhUx"
+		$this->tt_addToJavascriptModuleObject("censuses", $censuses);
+
+		$fields = [
+			"addressField" => $this->getProjectSetting('address'),
+			"latitudeField" => $this->getProjectSetting('latitude'),
+			"longitudeField" => $this->getProjectSetting('longitude')
+		];
+		$this->tt_addToJavascriptModuleObject("fields", $fields);
+
+		$urls = [
+			"getAddressUrl" => $this->getUrl("getAddress.php"),
+			"getCoordinatesUrl" => $this->getUrl("getCoordinates.php")
+		];
+		$this->tt_addToJavascriptModuleObject("urls", $urls);
+
+		echo '<script src="https://cdn.jsdelivr.net/npm/gasparesganga-jquery-loading-overlay@2.1.0/dist/loadingoverlay.min.js" integrity="sha384-MySkuCDi7dqpbJ9gSTKmmDIdrzNbnjT6QZ5cAgqdf1PeAYvSUde3uP8MGnBzuhUx"
 				crossorigin="anonymous"></script>';
-				echo "<script>
-				$(document).ready(function() {
-					console.log('Census Geocoder loaded');
-					var year = " . (int)$census['year'] . ";
 
-					function downloadCensusData() {
-						var address = $('[name=\"".$addressField."\"]').val();
-
-						if (address) {
-							var encodedAddress = address.replace(/United States/g, '');
-							console.log('Looking up '+encodedAddress);
-							$.post('".$this->getUrl('getAddress.php')."', { 'get':1,'address':encodedAddress, 'year': year}, function(json) {
-								console.log('Got data from TigerWeb');
-								console.log(json);
-								var data = JSON.parse(json);
-								if (data && data['result'] && data['result']['addressMatches'] && data['result']['addressMatches'][0] && data['result']['addressMatches'][0]['geographies'] && data['result']['addressMatches'][0]['geographies']['Census Blocks']) {
-									console.log('TigerWeb lookup data present');
-									var lookupTable = data['result']['addressMatches'][0]['geographies']['Census Blocks'][0];
-									processCensusData(lookupTable);
-								}
-							});
-						}
-					}
-
-					function downloadCensusDataFromLatLong() {
-						console.log('downloadCensusDataFromLatLong()')
-						
-						var latitude = $('[name=\"".$latitudeField."\"]').val();
-						var longitude = $('[name=\"".$longitudeField."\"]').val();
-
-						if(latitude && longitude) {
-							console.log('Looking up '+latitude+'/'+longitude);
-							$.LoadingOverlay('show')
-							$.ajax(
-							{
-								url:'".$this->getUrl('getCoordinates.php')."',
-								data:{
-									get: 1,
-									lat: latitude,
-									long: longitude,
-									year: year
-								},
-								type: 'POST'
-							}).done(function(json) {
-								$.LoadingOverlay('hide')
-								console.log('Got coordinate data');
-								console.log(json);
-								var data = JSON.parse(json);
-								if(data && data['result'] && data['result']['geographies'] && data['result']['geographies']['Census Blocks']) {
-									var lookupTable = data['result']['geographies']['Census Blocks'][0];
-									processCensusData(lookupTable);
-								}
-							});
-						}
-					}
-
-					function processCensusData(lookupTable) {
-						const mappings = " . json_encode($census['mappings']) . "
-						
-						mappings.forEach(mapping => {
-							let value = lookupTable[mapping.keys]
-							if (!value) {
-								value = '';
-							}
-							
-							const fieldName = mapping.fields
-							console.log('Setting '+fieldName+' to '+value);
-							var field = $('[name=\"'+fieldName+'\"]');
-							field.val(value);
-							field.change();
-
-							if(field.hasClass('rc-autocomplete')){
-								var autocompleteField = field.closest('td').find('.ui-autocomplete-input')
-								autocompleteField.val(field.find('option:selected').text())
-								autocompleteField.change()
-							}
-						})
-					}
-
-					// The following used to occur on the 'blur' event, but we switched it to 'change' since some
-					// modules update the field AFTER it has lost focus (like Address Autocompletion).
-					if('$addressField'){
-						$('[name=\"".$addressField."\"]').change(function() {
-							console.log('Looking up Census data');
-							downloadCensusData();
-						});
-					}
-
-					if('$latitudeField' && '$longitudeField'){
-						$('[name=\"".$latitudeField."\"]').change(function() {
-							downloadCensusDataFromLatLong();
-						});
-
-						$('[name=\"".$longitudeField."\"]').change(function() {
-							downloadCensusDataFromLatLong();
-						});
-					}
-				});
-				</script>";
-			}
-		}
+		echo "<script src='" . $this->getUrl("js/main.js") . "'></script>";
 	}
 }
-

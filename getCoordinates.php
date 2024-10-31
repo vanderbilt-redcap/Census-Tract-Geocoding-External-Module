@@ -4,7 +4,12 @@ if ($_POST['get']) {
 	$lat = (float)$_POST['lat'];
 	$long = (float)$_POST['long'];
 	$year = $_POST['year'];
-	$url = 'https://geocoding.geo.census.gov/geocoder/geographies/coordinates?y='.$lat.'&x='.$long."&".$module->getSharedArgs($year);
+	$benchmark_vintage = $_POST['benchmark_vintage'];
+	if ($benchmark_vintage) {
+		$url = 'https://geocoding.geo.census.gov/geocoder/geographies/coordinates?y='.$lat.'&x='.$long."&".$module->getSharedArgsBenchmark($benchmark_vintage);
+	} else {
+		$url = 'https://geocoding.geo.census.gov/geocoder/geographies/coordinates?y='.$lat.'&x='.$long."&".$module->getSharedArgsYear($year);
+	}
 	$ch = curl_init();
 	curl_setopt($ch, CURLOPT_URL, $url);
 	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);

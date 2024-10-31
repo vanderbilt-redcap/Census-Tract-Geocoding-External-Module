@@ -3,7 +3,7 @@
 
 	"namespace": "Vanderbilt\\CensusExternalModule",
 
-	"framework-version": 7,
+	"framework-version": 16,
 
 	"description": "This module converts an address to a host of information about the address, available via a project link.",
 	
@@ -25,12 +25,6 @@
 		}
     ],
 
-	"permissions": [
-		"hook_survey_page",
-		"hook_data_entry_form",
-		"redcap_every_page_before_render"
-	],
-
 	"enable-every-page-hooks-on-system-pages": true,
 
         "links": {
@@ -49,21 +43,24 @@
 			"name": "Field Containing the Full Address",
 			"required": true,
 			"type": "field-list",
-			"repeatable": false
+			"repeatable": false,
+      "autocomplete": true
 		},
 		{
 			"key": "latitude",
 			"name": "Field Containing the Latitude (if address not found)",
 			"required": false,
 			"type": "field-list",
-			"repeatable": false
+			"repeatable": false,
+      "autocomplete": true
 		},
 		{
 			"key": "longitude",
 			"name": "Field Containing the Longitude (if address not found)",
 			"required": false,
 			"type": "field-list",
-			"repeatable": false
+			"repeatable": false,
+      "autocomplete": true
 		},
 		{
 			"key": "censuses",
@@ -75,11 +72,19 @@
 					"key": "year",
 					"name": "Year",
 					"type": "dropdown",
-					"developer_comment": "Please do not attempt to add a 'current' choice; despite census.gov supporting it, this has broken things in the past due to changes in their API",
+					"developer_comment": "Deprecated in version 2 but retained to allow version 1 modules to function without configuration update",
+          "hidden": true,
 					"choices": [
 						{ "value": "2020", "name": "2020" },
 						{ "value": "2010", "name": "2010" }
 					]
+				},
+				{
+					"key": "benchmark_vintage",
+					"name": "Benchmark - Vintage",
+					"type": "dropdown",
+					"choices": [],
+          "autocomplete": true
 				},
 				{
 					"key": "mappings",
@@ -209,12 +214,14 @@
 								{ "value": "ZCTA5CC", "name": "ZCTA Class Code (ZIP Code Tabulation Area FIPS Class Code)" },
 								{ "value": "ZCTA5", "name": "Zip Code Tabulation Area Code (Zip Code Tabulation Area Code)" },
 								{ "value": "ZIP", "name": "ZIP Code (ZIP Code)" }
-							]
+							],
+                            "autocomplete": true
 						},
 						{
 							"key": "fields",
 							"name": "Field to Populate with Corresponding Data Key",
-							"type": "field-list"
+							"type": "field-list",
+                            "autocomplete": true
 						}
 					]
 				}
