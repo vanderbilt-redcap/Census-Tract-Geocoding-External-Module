@@ -29,7 +29,8 @@ $(document).ready(() => {
 				'get': 1,
 				'address': encodedAddress,
 				'year': census.year,
-				'benchmark_vintage': census.benchmark_vintage
+				'benchmark_vintage': census.benchmark_vintage,
+				'redcap_csrf_token': redcap_csrf_token
 			},
 			function(json) {
 				$.LoadingOverlay('hide');
@@ -66,7 +67,8 @@ $(document).ready(() => {
 					lat: latitude,
 					long: longitude,
 					year: census.year,
-					benchmark_vintage: census.benchmark_vintage
+					benchmark_vintage: census.benchmark_vintage,
+          redcap_csrf_token: redcap_csrf_token
 				},
 				type: 'POST'
 			}).done(function(json) {
