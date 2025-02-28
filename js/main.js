@@ -78,7 +78,7 @@ $(document).ready(() => {
 				let data = JSON.parse(json);
 				if (data && data['result'] && data['result']['geographies'] && data['result']['geographies']) {
 					census['lookupTable'] = data['result']['geographies'];
-					processCensusData(lookupTable);
+					processCensusData(census);
 				}
 			});
 	}
